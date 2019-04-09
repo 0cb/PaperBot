@@ -1,0 +1,55 @@
+#!/bin/bash
+# (un)natural selection
+# > PaperBot pipeline(??) for reservoir selection of 4 individuals
+# > Dependencies:
+#   + python3
+#   + R
+#
+# Author: 0cb (07.19.18)    Christian Bowman
+
+#set -euo pipefail
+
+PAPERPATH=$HOME/PaperBot
+
+countstats=$(ls -l $HOME/Downloads/stats.csv 2>/dev/null | wc -l)
+countupd=$(ls -l $PAPERPATH/updated.csv 2>/dev/null | wc -l)
+countrem=$(ls -l $PAPERPATH/remaining.csv 2>/dev/null | wc -l)
+
+if (( countstats != 0 ))  #check presence of 'stats.csv' export
+then
+    cp $HOME/Downloads/stats.csv $PAPERPATH/temp.csv
+fi
+
+    temp=$PAPERPATH/temp.csv
+    update=$PAPERPATH/updated.csv
+    select=$PAPERPATH/selected_$(date +%y%m%d%H%M%S)-$RANDOM.csv #add date to $subsample output
+    remain=$PAPERPATH/remaining.csv
+
+if (( countupd != 0 ))
+then
+    subsample -n 5 $update > $select  #python-based CLT (https://github.com/paulgb/subsample)
+else
+    subsample -n 5 $temp > $select
+fi
+
+    if (( countrem != 0 ))
+    then
+        python rm_update.py $select
+        echo UPDATE
+    else
+        python rm_dupl.py $select
+        echo DUPL
+    fi    
+##if select2 contains values in select1, resample until 4 unique choices
+    Rscript append_date.R $select #need to send prev ifelse input to here
+    echo APPEND
+
+    mv $select $PAPERPATH/Selected.JC
+
+#else    
+    echo "No .csv found"
+#fi
+
+echo COMPLETE
+
+exit

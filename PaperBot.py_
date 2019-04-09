@@ -1,0 +1,111 @@
+# --------------------------------------------
+# PaperBot - do it for the lit
+# > need to:
+#   + selection command
+#   + maybe sampling without replacement?
+#
+# --------------------------------------------
+
+
+# These are the dependecies. The bot depends on these to function, hence the name. Please do not change these unless your adding to them, because they can break the bot.
+import discord
+import asyncio
+from discord.ext.commands import Bot
+from discord.ext import commands
+
+import platform
+
+import csv
+import time
+
+# Here you can modify the bot's prefix and description and whether it sends help in direct messages or not.
+client = Bot(description="PaperBot by 0cb#0093", command_prefix="~", pm_help = False)
+#channel = client.get_channel('473893774745927690')#('404789350862159882') #journal-club
+#channel = discord.Object(id='404789350862159882')
+# This is what happens everytime the bot launches. In this case, it prints information like server count, user count the bot is connected to, and the bot id in the console.
+# Do not mess with it because the bot can break, if you wish to do so, please consult me or someone trusted.
+@client.event
+async def on_ready():
+	print('Logged in as '+client.user.name+' (ID:'+client.user.id+') | Connected to '+str(len(client.servers))+' servers | Connected to '+str(len(set(client.get_all_members())))+' users')
+	print('--------')
+	print('Current Discord.py Version: {} | Current Python Version: {}'.format(discord.__version__, platform.python_version()))
+	print('--------')
+	print('Use this link to invite {}:'.format(client.user.name))
+	print('https://discordapp.com/oauth2/authorize?client_id={}&scope=bot&permissions=493632'.format(client.user.id))
+        #Perms: Read msg hist; use ext emojis; send msg; attach files; mention @everyone; add rxn
+	print('--------')
+	print('Created by 0cb#0093')
+	return await client.change_presence(game=discord.Game(name='moping around')) #This is buggy, let us know if it doesn't work.
+
+@client.event
+async def on_command_error(error, ctx):
+    if isinstance(error, commands.CommandNotFound):
+        return
+    else:
+        print(error)
+
+
+# This is a basic example of a call and response command. You tell it do "this" and it does it.
+@client.command()
+async def ping(*args):
+
+	await client.say(":ping_pong: Pong!")
+	await asyncio.sleep(3)
+
+@client.command(pass_context=True)
+async def remind(ctx):
+    role = discord.utils.get(ctx.message.server.roles, name="test")
+    await client.say(f"PONG {role}")
+
+@client.command(pass_context=True)
+async def poke(ctx, member: discord.Member):
+    await client.send_message(member, 'You have been selected for the next Journal Club pool. Please respond to the #journal-club channel regarding your ability to present')
+
+@client.command(pass_context=True)
+async def getuser(ctx):
+    role = discord.utils.get(ctx.message.server.roles, name="Journal Club")
+    if role is None:
+        await client.say('There is no "test" role on this server!')
+        return
+    empty = True
+    for member in ctx.message.server.members:
+        if role in member.roles:
+            await client.say("{0.name}#{0.discriminator}".format(member))
+            empty = False
+    if empty:
+        await client.say("Nobody has the role {}".format(role.mention))
+
+@client.command(pass_context=True)
+async def stat(ctx):
+    #await client.request_offline_members(ctx.message.server)
+    role = discord.utils.get(ctx.message.server.roles, name="Journal Club")
+    before = time.time()
+    #nicknames = [m.name for m in ctx.message.server.members] #if role in member.roles)
+    for member in ctx.message.server.members:
+        nicknames = (member.name for member in ctx.message.server.members if role in member.roles)
+#        if role in member.roles:
+        with open('temp.csv', mode='w', encoding='utf-8', newline='') as csvfile:
+            writer = csv.writer(csvfile, dialect='unix')
+            for v in nicknames:
+                writer.writerow([v])
+    after = time.time()
+    await client.send_file(ctx.message.author, 'temp.csv', filename='stats.csv',
+                           content="Here's the list. Check PM's. Generated in {:.4}ms".format((after-before)*1000))
+
+"""@client.command(pass_context=True)
+async def bye(ctx):
+    presenter = ctx.message.author
+    await client."""
+
+"""@client.command()
+async def who(ctx):
+    embed = discord.Embed(title="PaperBot", description="tryingmybest", color=0xeee657)
+    embed.add_field(name="For")"""
+
+if __name__ == '__main__':
+    client.run('')
+
+# Thank you for using this and don't forget to star my repo on GitHub! [Repo Link: https://github.com/Habchy/BasicBot]
+
+# The help command is currently set to be not be Direct Messaged.
+# If you would like to change that, change "pm_help = False" to "pm_help = True" on line 9.
