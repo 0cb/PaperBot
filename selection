@@ -44,7 +44,8 @@ fi
     Rscript append_date.R $select #need to send prev ifelse input to here
     echo APPEND
 
-    mv $select $PAPERPATH/Selected.JC
+    cp $select $PAPERPATH/Selected.JC/selection.csv
+    mv $select $PAPERPATH/Selected.JC/old
 
 #else    
     echo "No .csv found"
