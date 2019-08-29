@@ -21,3 +21,27 @@ select.py
 temp.csv
 volunteer.txt 
 <--------- on Tue 09 Jul 2019 10:02:15 AM PDT --------->
+Updated
+ 2018-11-19-135512_1600x900_scrot.png
+append_date.R
+append_topic.R
+basicbot.py
+config.json
+holding
+hold.py
+PaperBot_deprec.py
+PaperBot.py
+__pycache__
+README.md
+remaining.csv
+rm_dupl.py
+rm_update.py
+scihub.py
+Selected.JC
+Selected.TEST
+selection
+select.py
+temp.csv
+updated.csv
+volunteer.txt 
+on Thu 29 Aug 2019 04:06:22 PM PDT
